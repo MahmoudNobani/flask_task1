@@ -19,7 +19,6 @@ class User:
 
         """
 
-
     def __init__(self, id, first_name, last_name, gender, age, address, phone_numbers):
         self.first_name = first_name
         self.age = age
