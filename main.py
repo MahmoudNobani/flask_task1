@@ -18,13 +18,7 @@ class user:
             phone_numbers (string): represents the phone_number of the user
 
         """
-    id = None
-    first_name = None
-    last_name = None
-    gender = None
-    age = None
-    address = {}
-    phone_numbers = []
+
 
     def __init__(self, id, first_name, last_name, gender, age, address, phone_numbers):
         self.first_name = first_name
@@ -182,8 +176,7 @@ def add_user() -> json:
                             'address': address, 'phone_numbers': phone_numbers}), 201
         else:
             del temp
-            return "user id has to be unique",201
-
+            return "user id has to be unique", 201
 
 
 @app.route('/del_user/<int:user_id>', methods=['DELETE'])
