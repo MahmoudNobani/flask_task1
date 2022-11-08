@@ -27,8 +27,6 @@ class User:
         self.last_name = kwargs["last_name"]
         self.address = kwargs["address"]
 
-
-
     def print_string(self) -> dict:
         """this function aims to print hte object and return its values as a dictionary
         Args:
@@ -41,7 +39,7 @@ class User:
 
         dict_user = {"id": self.id_, "first_name": self.first_name, "last_name": self.last_name, "age": self.age,
                      "gender": self.gender, "address": self.address, "phone_numbers": self.phone_numbers}
-        #print(dict_user)
+        # print(dict_user)
         return dict_user
 
 
@@ -59,23 +57,6 @@ def add_to_class(temp: object) -> bool:
             return False
     users_object_list.append(temp)
     return True
-
-
-def print_json():
-    """this function aims to print the edited changes onto the json file
-        Args:
-            this function doesn't need any arguments
-
-        Returns:
-            no return value
-
-        """
-    with open('temp.json', 'w') as f:
-        x = []
-        for i in users_object_list:
-            d = i.print_string()
-            x.append(d)
-        json.dump(x, f)
 
 
 def get_users_data() -> dict:
@@ -149,7 +130,7 @@ def get_user_with_id(user_id: int) -> dict:
 def add_user() -> json:
     """this function adds a new user to the users file
         Args:
-            this function doesn't take any normal parameters, but takes some in the route
+            this function doesn't take any normal parameters
 
         Returns:
             returns a json of the data entered
@@ -157,20 +138,10 @@ def add_user() -> json:
         """
     if request.method == 'POST':
         new_user = request.json
-        id_ = new_user['id']
-        first_name = new_user['first_name']
-        last_name = new_user['last_name']
-        gender = new_user['gender']
-        age = new_user['age']
-        phone_numbers = new_user['phone_numbers']
-        address = new_user['address']
-
-        temp = User(int(id_), first_name, last_name, gender, age, address, phone_numbers)
+        temp = User(**new_user)
         unique = add_to_class(temp)
         if unique:
-            print_json()
-            return jsonify({'id': id_, 'first_name': first_name, 'last_name': last_name, 'age': age, 'gender': gender,
-                            'address': address, 'phone_numbers': phone_numbers}), 201
+            return jsonify(new_user), 201
         else:
             del temp
             return "user id has to be unique", 201
@@ -210,16 +181,10 @@ def update_user(user_id):
             if x.id_ == user_id:
                 users_object_list.remove(x)
                 updated_user = request.json
-                first_name = updated_user['first_name']
-                last_name = updated_user['last_name']
-                gender = updated_user['gender']
-                age = updated_user['age']
-                phone_numbers = updated_user['phone_numbers']
-                address = updated_user['address']
-                temp = User(int(user_id), first_name, last_name, gender, age, address, phone_numbers)
+                updated_user["id"] = int(user_id)
+                temp = User(**updated_user)
 
                 users_object_list.append(temp)
-                print_json()
                 return "operation succesfull", 201
         return "user not found", 201
 
