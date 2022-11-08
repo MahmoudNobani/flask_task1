@@ -5,7 +5,7 @@ app = Flask(__name__)
 global users_object_list
 
 
-class user:
+class User:
     """this class represents the user
 
         Attributes:
@@ -104,7 +104,7 @@ def create_users_list(users_data: dict) -> list:
     """
     user_objects = []
     for i in users_data:
-        temp = user(i["id"], i["first_name"], i["last_name"], i["gender"], i["age"], i["address"], i["phone_numbers"])
+        temp = User(i["id"], i["first_name"], i["last_name"], i["gender"], i["age"], i["address"], i["phone_numbers"])
         user_objects.append(temp)
     return user_objects
 
@@ -168,7 +168,7 @@ def add_user() -> json:
         phone_numbers = new_user['phone_numbers']
         address = new_user['address']
 
-        temp = user(int(id), first_name, last_name, gender, age, address, phone_numbers)
+        temp = User(int(id), first_name, last_name, gender, age, address, phone_numbers)
         unique = add_to_class(temp)
         if unique:
             print_json()
@@ -219,7 +219,7 @@ def update_user(user_id):
                 age = updated_user['age']
                 phone_numbers = updated_user['phone_numbers']
                 address = updated_user['address']
-                temp = user(int(user_id), first_name, last_name, gender, age, address, phone_numbers)
+                temp = User(int(user_id), first_name, last_name, gender, age, address, phone_numbers)
 
                 users_object_list.append(temp)
                 print_json()
