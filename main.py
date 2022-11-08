@@ -2,7 +2,6 @@ import json
 from flask import Flask, render_template, url_for, flash, redirect, request, jsonify
 
 app = Flask(__name__)
-global users_object_list
 
 
 class User:
@@ -19,14 +18,16 @@ class User:
 
         """
 
-    def __init__(self, id, first_name, last_name, gender, age, address, phone_numbers):
-        self.first_name = first_name
-        self.age = age
-        self.id = id
-        self.phone_numbers = phone_numbers
-        self.gender = gender
-        self.last_name = last_name
-        self.address = address
+    def __init__(self, **kwargs):
+        self.first_name = kwargs["first_name"]
+        self.age = kwargs["age"]
+        self.id_ = kwargs["id"]
+        self.phone_numbers = kwargs["phone_numbers"]
+        self.gender = kwargs["gender"]
+        self.last_name = kwargs["last_name"]
+        self.address = kwargs["address"]
+
+
 
     def print_string(self) -> dict:
         """this function aims to print hte object and return its values as a dictionary
@@ -36,16 +37,12 @@ class User:
         Returns:
             returns dictionary d that represents the object attributes
                 """
-        print(self.id, self.first_name, self.last_name, self.age, self.gender, self.address, self.phone_numbers)
-        d = {}
-        d["id"] = self.id
-        d["first_name"] = self.first_name
-        d["last_name"] = self.last_name
-        d["age"] = self.age
-        d["gender"] = self.gender
-        d["address"] = self.address
-        d["phone_numbers"] = self.phone_numbers
-        return d
+        print(self.id_, self.first_name, self.last_name, self.age, self.gender, self.address, self.phone_numbers)
+
+        dict_user = {"id": self.id_, "first_name": self.first_name, "last_name": self.last_name, "age": self.age,
+                     "gender": self.gender, "address": self.address, "phone_numbers": self.phone_numbers}
+        #print(dict_user)
+        return dict_user
 
 
 def add_to_class(temp: object) -> bool:
@@ -58,7 +55,7 @@ def add_to_class(temp: object) -> bool:
 
             """
     for x in users_object_list:
-        if temp.id is x.id:
+        if temp.id_ == x.id_:
             return False
     users_object_list.append(temp)
     return True
@@ -103,7 +100,8 @@ def create_users_list(users_data: dict) -> list:
     """
     user_objects = []
     for i in users_data:
-        temp = User(i["id"], i["first_name"], i["last_name"], i["gender"], i["age"], i["address"], i["phone_numbers"])
+        temp = User(**i)
+        # temp = User(i["id"], i["first_name"], i["last_name"], i["gender"], i["age"], i["address"], i["phone_numbers"])
         user_objects.append(temp)
     return user_objects
 
@@ -123,25 +121,25 @@ def get_users() -> list:
     if request.method == 'GET':
         user_counter = 1
         for i in users_object_list:
-            temp = f"user " + str(user_counter) + ": " + i.first_name + " " + i.last_name + " " + str(i.id)
+            temp = f"user " + str(user_counter) + ": " + i.first_name + " " + i.last_name + " " + str(i.id_)
             users_names.append(temp)
             user_counter += 1
-    return users_names, 201
+        return users_names, 201
 
 
 @app.route('/get_user/<int:user_id>', methods=['GET'])
 def get_user_with_id(user_id: int) -> dict:
-    """this function Return the user with the given id.
+    """this function Return the user with the given id_.
 
         Args:
-            user_id (int): represents the id of the user we want to search
+            user_id (int): represents the id_ of the user we want to search
 
         Returns:
-            this function returns the data of the user with the given id
+            this function returns the data of the user with the given id_
 
         """
     if request.method == 'GET':
-        result = next((x for x in users_object_list if x.id == user_id), "no such user was found")
+        result = next((x for x in users_object_list if x.id_ == user_id), "no such user was found")
         if result == "no such user was found":
             return result, 201
         return result.print_string(), 201
@@ -159,7 +157,7 @@ def add_user() -> json:
         """
     if request.method == 'POST':
         new_user = request.json
-        id = new_user['id']
+        id_ = new_user['id']
         first_name = new_user['first_name']
         last_name = new_user['last_name']
         gender = new_user['gender']
@@ -167,11 +165,11 @@ def add_user() -> json:
         phone_numbers = new_user['phone_numbers']
         address = new_user['address']
 
-        temp = User(int(id), first_name, last_name, gender, age, address, phone_numbers)
+        temp = User(int(id_), first_name, last_name, gender, age, address, phone_numbers)
         unique = add_to_class(temp)
         if unique:
             print_json()
-            return jsonify({'id': id, 'first_name': first_name, 'last_name': last_name, 'age': age, 'gender': gender,
+            return jsonify({'id': id_, 'first_name': first_name, 'last_name': last_name, 'age': age, 'gender': gender,
                             'address': address, 'phone_numbers': phone_numbers}), 201
         else:
             del temp
@@ -190,7 +188,7 @@ def del_user(user_id):
         """
     if request.method == 'DELETE':
         for x in users_object_list:
-            if x.id == user_id:
+            if x.id_ == user_id:
                 users_object_list.remove(x)
 
                 return "operation succesfull", 201
@@ -209,7 +207,7 @@ def update_user(user_id):
         """
     if request.method == 'PUT':
         for x in users_object_list:
-            if x.id == user_id:
+            if x.id_ == user_id:
                 users_object_list.remove(x)
                 updated_user = request.json
                 first_name = updated_user['first_name']
@@ -227,6 +225,7 @@ def update_user(user_id):
 
 
 if __name__ == '__main__':
+    # global users_object_list
     users_data = get_users_data()
     users_object_list = create_users_list(users_data)
     app.run(debug=True)
