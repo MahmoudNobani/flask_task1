@@ -87,7 +87,7 @@ def create_users_list(users_data: dict) -> list:
     return user_objects
 
 
-@app.route('/get_users', methods=['GET'])
+@app.route('/users', methods=['GET'])
 def get_users() -> list:
     """this function perform a get method with the aim to return the users list
 
@@ -108,7 +108,7 @@ def get_users() -> list:
         return users_names, 201
 
 
-@app.route('/get_user/<int:user_id>', methods=['GET'])
+@app.route('/users/<int:user_id>', methods=['GET'])
 def get_user_with_id(user_id: int) -> dict:
     """this function Return the user with the given id_.
 
@@ -126,7 +126,7 @@ def get_user_with_id(user_id: int) -> dict:
         return result.print_string(), 201
 
 
-@app.route('/add_user', methods=['POST'])
+@app.route('/users', methods=['POST'])
 def add_user() -> json:
     """this function adds a new user to the users file
         Args:
@@ -147,7 +147,7 @@ def add_user() -> json:
             return "user id has to be unique", 201
 
 
-@app.route('/del_user/<int:user_id>', methods=['DELETE'])
+@app.route('/users/<int:user_id>', methods=['DELETE'])
 def del_user(user_id):
     """given the id, this function perform the delete operation on it
 
@@ -166,7 +166,7 @@ def del_user(user_id):
         return "user not found", 201
 
 
-@app.route('/update_user/<int:user_id>', methods=['PUT'])
+@app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     """given the id, this function perform the delete operation on it
 
