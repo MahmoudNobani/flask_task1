@@ -195,13 +195,19 @@ def get_users() -> list:
             returns a list that contains all the user names we have
 
         """
+    """another approach
     users_names = []
     user_counter = 1
     for i in users_object_list:
         temp = f"user " + str(user_counter) + ": " + i.first_name + " " + i.last_name + " " + str(i.id_)
         users_names.append(temp)
         user_counter += 1
-    return users_names
+    return users_names"""
+    users_data = []
+    for i in users_object_list:
+        data = i.print_string()
+        users_data.append(data)
+    return users_data
 
 
 def add_user() -> json:
