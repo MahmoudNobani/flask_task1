@@ -111,13 +111,13 @@ def users() -> json:
 
 @app.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
 def users_with_id(user_id: int) -> json:
-    """this function Return the user with the given id_.
+    """this function performs the get, put and delete operation on the user with the given id
 
         Args:
-            user_id (int): represents the id_ of the user we want to search
+            user_id (int): represents the id_ of the user we want to perform the operation on
 
         Returns:
-            this function returns the data of the user with the given id_
+            this function returns a json the either states if the operation is succesfull or not or the data of the user
 
         """
     if request.method == 'GET':
