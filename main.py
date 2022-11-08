@@ -1,4 +1,6 @@
 import json
+import string
+
 from flask import Flask, render_template, url_for, flash, redirect, request, jsonify
 
 app = Flask(__name__)
@@ -87,29 +89,28 @@ def create_users_list(users_data: dict) -> list:
     return user_objects
 
 
-@app.route('/users', methods=['GET'])
-def get_users() -> list:
-    """this function perform a get method with the aim to return the users list
+@app.route('/users', methods=['GET', 'POST'])
+def users() -> json:
+    """this function performs both get and post methods
 
         Args:
             there is no parameters
 
         Returns:
-            returns a list that contains all the user names we have plus a 201 status code
+            returns a json that contains all the wanted result plus a 201 status code
 
         """
-    users_names = []
     if request.method == 'GET':
-        user_counter = 1
-        for i in users_object_list:
-            temp = f"user " + str(user_counter) + ": " + i.first_name + " " + i.last_name + " " + str(i.id_)
-            users_names.append(temp)
-            user_counter += 1
-        return users_names, 201
+        users_names = get_users()
+        return jsonify(users_names), 201
+
+    elif request.method == 'POST':
+        result = add_user()
+        return result, 201
 
 
-@app.route('/users/<int:user_id>', methods=['GET'])
-def get_user_with_id(user_id: int) -> dict:
+@app.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
+def users_with_id(user_id: int) -> json:
     """this function Return the user with the given id_.
 
         Args:
@@ -120,13 +121,89 @@ def get_user_with_id(user_id: int) -> dict:
 
         """
     if request.method == 'GET':
-        result = next((x for x in users_object_list if x.id_ == user_id), "no such user was found")
-        if result == "no such user was found":
-            return result, 201
-        return result.print_string(), 201
+        result = get_user_with_id(int(user_id))
+        return jsonify(result), 201
+    elif request.method == 'DELETE':
+        result = del_user(int(user_id))
+        return jsonify(result), 201
+    if request.method == 'PUT':
+        result = update_user(int(user_id))
+        return jsonify(result), 201
 
 
-@app.route('/users', methods=['POST'])
+def get_user_with_id(user_id: int) -> dict:
+    """this function Return the user with the given id_.
+
+        Args:
+            user_id (int): represents the id_ of the user we want to search
+
+        Returns:
+            this function returns the data of the user with the given id_ as a dict
+
+        """
+    result = next((x for x in users_object_list if x.id_ == user_id), "no such user was found")
+    if result == "no such user was found":
+        return result
+    return result.print_string()
+
+
+def del_user(user_id: int) -> string:
+    """given the id, this function perform the delete operation on it
+
+        Args:
+             user_id (int): represents the id of the user we want to delete
+        Returns:
+            string: represents whether the operation was successful or not
+
+        """
+
+    for x in users_object_list:
+        if x.id_ == user_id:
+            users_object_list.remove(x)
+            return "operation was successful"
+    return "user not found"
+
+
+def update_user(user_id: int) -> string:
+    """given the id, this function perform the update operation on it
+
+        Args:
+             user_id (int): represents the id of the user we want to update
+        Returns:
+            string: represents whether the operation was successful or not
+
+        """
+    for x in users_object_list:
+        print(x.id_," ",user_id)
+        if x.id_ == user_id:
+            users_object_list.remove(x)
+            updated_user = request.json
+            updated_user["id"] = int(user_id)
+            temp = User(**updated_user)
+            users_object_list.append(temp)
+            return "operation succesfull"
+    return "user not found"
+
+
+def get_users() -> list:
+    """this function perform a get method with the aim to return the users list
+
+        Args:
+            there is no parameters
+
+        Returns:
+            returns a list that contains all the user names we have
+
+        """
+    users_names = []
+    user_counter = 1
+    for i in users_object_list:
+        temp = f"user " + str(user_counter) + ": " + i.first_name + " " + i.last_name + " " + str(i.id_)
+        users_names.append(temp)
+        user_counter += 1
+    return users_names
+
+
 def add_user() -> json:
     """this function adds a new user to the users file
         Args:
@@ -136,57 +213,14 @@ def add_user() -> json:
             returns a json of the data entered
 
         """
-    if request.method == 'POST':
-        new_user = request.json
-        temp = User(**new_user)
-        unique = add_to_class(temp)
-        if unique:
-            return jsonify(new_user), 201
-        else:
-            del temp
-            return "user id has to be unique", 201
-
-
-@app.route('/users/<int:user_id>', methods=['DELETE'])
-def del_user(user_id):
-    """given the id, this function perform the delete operation on it
-
-        Args:
-             user_id (int): represents the id of the user we want to delete
-        Returns:
-            string: represents whether the operation was successful or not
-
-        """
-    if request.method == 'DELETE':
-        for x in users_object_list:
-            if x.id_ == user_id:
-                users_object_list.remove(x)
-
-                return "operation succesfull", 201
-        return "user not found", 201
-
-
-@app.route('/users/<int:user_id>', methods=['PUT'])
-def update_user(user_id):
-    """given the id, this function perform the delete operation on it
-
-        Args:
-             user_id (int): represents the id of the user we want to delete
-        Returns:
-            string: represents whether the operation was successful or not
-
-        """
-    if request.method == 'PUT':
-        for x in users_object_list:
-            if x.id_ == user_id:
-                users_object_list.remove(x)
-                updated_user = request.json
-                updated_user["id"] = int(user_id)
-                temp = User(**updated_user)
-
-                users_object_list.append(temp)
-                return "operation succesfull", 201
-        return "user not found", 201
+    new_user = request.json
+    temp = User(**new_user)
+    unique = add_to_class(temp)
+    if unique:
+        return jsonify(new_user)
+    else:
+        del temp
+        return "user id has to be unique"
 
 
 if __name__ == '__main__':
