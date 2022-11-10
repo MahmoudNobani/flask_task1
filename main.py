@@ -102,7 +102,7 @@ def users() -> json:
         """
     if request.method == 'GET':
         users_names = get_users()
-        return jsonify(users_names), 201
+        return jsonify(users_names), 200
 
     elif request.method == 'POST':
         result = add_user()
@@ -122,12 +122,20 @@ def users_with_id(user_id: int) -> json:
         """
     if request.method == 'GET':
         result = get_user_with_id(int(user_id))
+        if result == "no such user was found":
+            return jsonify(result), 404
         return jsonify(result), 201
+
     elif request.method == 'DELETE':
         result = del_user(int(user_id))
-        return jsonify(result), 201
+        if result == "user not found":
+            return jsonify(result), 404
+        return jsonify(result), 202
+
     if request.method == 'PUT':
         result = update_user(int(user_id))
+        if result == "user not found":
+            return jsonify(result), 404
         return jsonify(result), 201
 
 
