@@ -182,7 +182,7 @@ def update_user(user_id: int) -> string:
 
         """
     for x in users_object_list:
-        print(x.id_, " ", user_id)
+        print(x.id_," ",user_id)
         if x.id_ == user_id:
             users_object_list.remove(x)
             updated_user = request.json
