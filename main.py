@@ -182,14 +182,14 @@ def update_user(user_id: int) -> string:
 
         """
     for x in users_object_list:
-        print(x.id_," ",user_id)
+        print(x.id_, " ", user_id)
         if x.id_ == user_id:
             users_object_list.remove(x)
             updated_user = request.json
             updated_user["id"] = int(user_id)
             temp = User(**updated_user)
             users_object_list.append(temp)
-            return "operation succesfull"
+            return "operation successful"
     return "user not found"
 
 
@@ -211,11 +211,11 @@ def get_users() -> list:
         users_names.append(temp)
         user_counter += 1
     return users_names"""
-    users_data = []
+    all_users_data = []
     for i in users_object_list:
         data = i.print_string()
-        users_data.append(data)
-    return users_data
+        all_users_data.append(data)
+    return all_users_data
 
 
 def add_user() -> json:
