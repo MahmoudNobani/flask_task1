@@ -1,7 +1,7 @@
 import json
 import string
 
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, url_for, flash, redirect, request, jsonify
 
 app = Flask(__name__)
 
@@ -182,7 +182,7 @@ def update_user(user_id: int) -> string:
 
         """
     for x in users_object_list:
-        print(x.id_, " ", user_id)
+        print(x.id_," ",user_id)
         if x.id_ == user_id:
             users_object_list.remove(x)
             updated_user = request.json
