@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
 
 
-class phoneSchema(Schema):
+class PhoneSchema(Schema):
     """this class the schema for the PhoneNumbers table
                     Attributes:
                         user_id (string): represents the id of the unique user
@@ -13,7 +13,7 @@ class phoneSchema(Schema):
     number = fields.String()
 
 
-class addSchema(Schema):
+class AddSchema(Schema):
     """this class the schema for the Address table
                         Attributes:
                             user_id (string): represents the id of the unique user
@@ -28,7 +28,8 @@ class addSchema(Schema):
     state = fields.String()
     postal_code = fields.String()
 
-class userSchema(Schema):
+
+class UserSchema(Schema):
     """this class represents the Users table schema
                     Attributes:
                         id_ (string): represents the id of the unique user
@@ -44,5 +45,5 @@ class userSchema(Schema):
     last_name = fields.String()
     age = fields.String()
     gender = fields.String()
-    address = fields.Nested(addSchema(only=("street_address","city","state","postal_code")), many=True)
-    PhoneNumbers = fields.Nested(phoneSchema(only=("type","number")), many=True)
+    address = fields.Nested(AddSchema(only=("street_address", "city", "state", "postal_code")), many=True)
+    PhoneNumbers = fields.Nested(PhoneSchema(only=("type", "number")), many=True)

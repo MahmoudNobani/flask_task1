@@ -8,7 +8,7 @@ from conf import db
 from models.Address import Address
 from models.PhoneNumbers import PhoneNumbers
 from models.Users import User
-from schema import userSchema
+from schema import UserSchema
 
 
 def add_user_gen(data: json) -> string:
@@ -56,7 +56,7 @@ def get_all_users() -> json:
 
         """
     people = User.query.all()
-    schema = userSchema(many=True)
+    schema = UserSchema(many=True)
     return jsonify(schema.dump(people)), 200
 
 
@@ -76,7 +76,7 @@ def add_user() -> json:
     if validation[:6] == "unique":
         return jsonify(validation), 400
     new_user_data = User.query.filter(int(validation) == User.id_)
-    schema = userSchema(many=True)
+    schema = UserSchema(many=True)
     return jsonify(schema.dump(new_user_data)), 201
 
 
@@ -93,7 +93,7 @@ def get_user_with_id(user_id: string) -> json:
         """
     try:
         people = User.query.filter(int(user_id) == User.id_)
-        schema = userSchema(many=True)
+        schema = UserSchema(many=True)
         if not schema.dump(people):
             return jsonify("user was not found"), 404
         return schema.dump(people), 200

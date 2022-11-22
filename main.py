@@ -1,6 +1,6 @@
 from conf import app,connex_app
 
-connex_app.add_api("swagger.yml")
+connex_app.add_api("open_api/swagger.yml")
 
 if __name__ == '__main__':
     app.app_context().push()
