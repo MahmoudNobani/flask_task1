@@ -47,3 +47,4 @@ class UserSchema(Schema):
     gender = fields.String()
     address = fields.Nested(AddSchema(only=("street_address", "city", "state", "postal_code")), many=True)
     PhoneNumbers = fields.Nested(PhoneSchema(only=("type", "number")), many=True)
+

@@ -174,3 +174,4 @@ def update_user_gen(user: object, updated_user: json) -> json:
         user[0].PhoneNumbers.append(temp2)
     # update the address data
     user[0].address[0].update(user_data["id"], **address_data["address"])
+

@@ -41,4 +41,5 @@ class User(db.Model):
         self.id_ = kwargs["id"]
         self.gender = kwargs["gender"]
         self.last_name = kwargs["last_name"]
+        
 
