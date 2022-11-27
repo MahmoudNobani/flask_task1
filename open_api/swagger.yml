@@ -32,7 +32,7 @@ components:
         last_name:
           type: "string"
         address:
-          $ref: "#/components/schemas/add"
+          $ref: "#/components/schemas/address"
       required:
         - id
         - first_name
@@ -43,7 +43,7 @@ components:
         - phone_numbers
 
 
-    add:
+    address:
       type: "object"
       properties:
         street_address:
@@ -83,7 +83,7 @@ components:
 paths:
   /users:
     get:
-      operationId: "APIS.get_users"
+      operationId: "methods.get_all_users"
       tags:
         - "Users"
       summary: "list all the Users"
@@ -91,7 +91,7 @@ paths:
         "200":
           description: "Successfully listed the users"
     post:
-      operationId: "APIS.add_user"
+      operationId: "methods.add_user"
       tags:
         - "Users"
       summary: "add a User"
@@ -105,11 +105,11 @@ paths:
       responses:
         "201":
           description: "Successfully created person"
-        "404":
-          description: "failure"
+        "400":
+          description: "sql failure, unique constraint, etc"
   /users/{user_id}:
     get:
-      operationId: "APIS.get_user_with_id"
+      operationId: "methods.get_user_with_id"
       tags:
         - Users
       summary: "get the user with the entered id"
@@ -119,9 +119,25 @@ paths:
         "200":
           description: "Successfully found the user"
         "404":
-          description: "failure"
+          description: "not found"
+        "400":
+          description: "bad request"
+    delete:
+      operationId: "methods.del_user"
+      tags:
+        - Users
+      summary: "delete the user with the entered id"
+      parameters:
+        - $ref: "#/components/parameters/id_"
+      responses:
+        "202":
+          description: "Successfully deleted"
+        "404":
+          description: "not found"
+        "400":
+          description: "bad request"
     put:
-      operationId: "APIS.update_user"
+      operationId: "methods.update_user"
       tags:
         - Users
       summary: "update the user with the entered id"
@@ -138,16 +154,4 @@ paths:
         "201":
           description: "Successfully updated"
         "404":
-          description: "failure"
-    delete:
-      operationId: "APIS.del_user"
-      tags:
-        - Users
-      summary: "delete the user with the entered id"
-      parameters:
-        - $ref: "#/components/parameters/id_"
-      responses:
-        "202":
-          description: "Successfully deleted"
-        "404":
-          description: "failure"
+          description: "user not found"

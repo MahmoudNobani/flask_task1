@@ -35,5 +35,28 @@
     "number": "0588744449"
     }
     ]
-  }
+  },
+  {
+        "id": 3,
+        "first_name": "fatima",
+        "last_name": "ahmad",
+        "gender": "female",
+        "age": 16,
+        "address": {
+            "street_address": "666",
+            "city": "nabuls",
+            "state": "CA",
+            "postal_code": "123456"
+        },
+        "phone_numbers": [
+            {
+                "type": "home",
+                "number": "3"
+            },
+            {
+                "type": "office",
+                "number": "1"
+            }
+        ]
+    }
 ]
