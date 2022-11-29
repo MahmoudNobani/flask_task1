@@ -23,14 +23,14 @@ components:
         id:
           type: "integer"
           uniqueItems: true
-        phone_numbers:
-          type: array
-          items:
-              $ref: "#/components/schemas/phone"
         gender:
           type: "string"
         last_name:
           type: "string"
+        phone_numbers:
+          type: array
+          items:
+              $ref: "#/components/schemas/phone"
         address:
           $ref: "#/components/schemas/address"
       required:
@@ -70,6 +70,17 @@ components:
         - type
         - number
 
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      x-bearerInfoFunc: methods.decode_token
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+
 
   parameters:
     id_:
@@ -90,6 +101,14 @@ paths:
       responses:
         "200":
           description: "Successfully listed the users"
+          content:
+            'text/plain':
+              schema:
+                type: string
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwt: [ 'secret' ]
     post:
       operationId: "methods.add_user"
       tags:
@@ -107,6 +126,10 @@ paths:
           description: "Successfully created person"
         "400":
           description: "sql failure, unique constraint, etc"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwt: [ 'secret' ]
   /users/{user_id}:
     get:
       operationId: "methods.get_user_with_id"
@@ -122,6 +145,10 @@ paths:
           description: "not found"
         "400":
           description: "bad request"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwt: [ 'secret' ]
     delete:
       operationId: "methods.del_user"
       tags:
@@ -136,6 +163,10 @@ paths:
           description: "not found"
         "400":
           description: "bad request"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwt: [ 'secret' ]
     put:
       operationId: "methods.update_user"
       tags:
@@ -155,3 +186,20 @@ paths:
           description: "Successfully updated"
         "404":
           description: "user not found"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwt: [ 'secret' ]
+  /auth/{user_id}:
+    get:
+      summary: Return JWT token
+      operationId: methods.generate_token
+      parameters:
+        - $ref: "#/components/parameters/id_"
+      responses:
+        '200':
+          description: JWT token
+          content:
+            'text/plain':
+              schema:
+                type: string
