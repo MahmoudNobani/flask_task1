@@ -1,10 +1,14 @@
 import itertools
 import json
 import string
+import time
 
+from jose import JWTError
+import jwt
 from flask import jsonify, request
+from werkzeug.exceptions import Unauthorized
 
-from conf import db
+from conf import db, JWT_ISSUER, JWT_LIFETIME_SECONDS, JWT_SECRET, JWT_ALGORITHM
 from models.Address import Address
 from models.PhoneNumbers import PhoneNumbers
 from models.Users import User
@@ -18,15 +22,17 @@ def add_user_gen(data: json) -> string:
         Returns:
             The return value is a string that either represent the success or failure of the addition process
     """
-    n = 5  # length of smaller half
-    updated_user_data = iter(data.items())  # put the items of updated users in an iterable
+    address_data = {}
+    phone_data = {}
+    user_data = {}
 
-    user_data = dict(itertools.islice(updated_user_data, n))  # list of user date: id,fname,lname,gender,age
-    remaining_data = dict(updated_user_data)  # grab the rest of the data (address, phone)
-    remaining_data_items = iter(remaining_data.items())  # put the items of the remaining data in iterable
-
-    address_data = dict(itertools.islice(remaining_data_items, 1))  # list of address only
-    phone_data = dict(remaining_data_items)  # list of phone only
+    for i in data:
+        if i == "address":
+            address_data[i] = data[i]
+        elif i == "phone_numbers":
+            phone_data[i] = data[i]
+        else:
+            user_data[i] = data[i]
 
     # add to the user object
     new_user = User(**user_data)
@@ -55,8 +61,10 @@ def get_all_users() -> json:
             returns a json that contains all the users we have, with 200 status code
 
         """
+
     people = User.query.all()
     schema = UserSchema(many=True)
+    print("x")
     return jsonify(schema.dump(people)), 200
 
 
@@ -137,7 +145,7 @@ def update_user(user_id: string) -> json:
         """
     updated_user = request.json
     updated_user["id"] = int(user_id)
-    try:
+    try:#check if exists
         user = db.session.execute(db.select(User).filter(User.id_ == int(user_id))).one()
     except Exception as err:
         return jsonify(f"Unexpected {err=}, {type(err)=}"), 404
@@ -156,15 +164,18 @@ def update_user_gen(user: object, updated_user: json) -> json:
                     there is no return value
                         """
 
-    n = 5  # length of smaller half
-    updated_user_data = iter(updated_user.items())  # put the items of updated users in an iterable
+    address_data = {}
+    phone_data = {}
+    user_data = {}
 
-    user_data = dict(itertools.islice(updated_user_data, n))  # list of user date: id,fname,lname,gender,age
-    remaining_data = dict(updated_user_data)  # grab the rest of the data (address, phone)
-    remaining_data_items = iter(remaining_data.items())  # put the items of the remaining data in iterable
+    for i in updated_user:
+        if i == "address":
+            address_data[i] = updated_user[i]
+        elif i == "phone_numbers":
+            phone_data[i] = updated_user[i]
+        else:
+            user_data[i] = updated_user[i]
 
-    address_data = dict(itertools.islice(remaining_data_items, 1))  # list of address only
-    phone_data = dict(remaining_data_items)  # list of phone only
     # update user date
     user[0].update(**user_data)
     # update the phone numbers data
@@ -175,3 +186,45 @@ def update_user_gen(user: object, updated_user: json) -> json:
     # update the address data
     user[0].address[0].update(user_data["id"], **address_data["address"])
 
+
+def generate_token(user_id: int) -> str:
+    """ the function is used to create authentication token
+                Args:
+                    user (int): represents the id of the user who wants the token
+                Returns:
+                        token (str)
+                            """
+    timestamp = _current_timestamp()
+    payload = {
+        "iss": JWT_ISSUER,
+        "iat": int(timestamp),
+        "exp": int(timestamp + JWT_LIFETIME_SECONDS),
+        "sub": str(user_id),
+    }
+
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def decode_token(token: str):
+    """ the function is used to decode authentication token
+                Args:
+                    token (str): represents the token
+                Returns:
+                    either a dictionary that represents the decoded token or an error exception
+                            """
+    try:
+        return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    except JWTError as e:
+        raise Unauthorized from e
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+
+
+def _current_timestamp() -> int:
+    """ the function is used to get current timestamp
+            Args:
+                no arguments
+            Returns:
+                return the current time
+                        """
+    return int(time.time())
